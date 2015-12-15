@@ -1,3 +1,36 @@
+WIP Libretro port of Atari800 emulator version 3.1.0
+----------------------------------------------------
+
+In joy mode
+
+L3  NA
+R3  NA 
+L2  KEY SPACE
+R2  KEY ESCAPE
+L   CONSOL_OPTION
+R   TOGGLE UI
+SEL CONSOL_SELECT
+STR CONSOL_START
+A   FIRE1/KEY RETURN IN GUI
+B   KEY RETURN 
+X   FIRE2/KEY ESCAPE IN GUI
+Y   VKBD ON/OFF
+
+In Keayboard mode
+
+F1 MAIN GUI
+F2 CONSOL_OPTION
+F3 CONSOL_SELECT
+F4 CONSOL_START
+UP
+DOWN
+LEFT
+RIGHT
+RETURN 
+ESCAPE 
+SPACE
+
+
 Atari800 emulator version 3.1.0
 -------------------------------
 

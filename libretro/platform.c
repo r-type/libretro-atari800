@@ -48,6 +48,7 @@ static int swap_joysticks = FALSE;
 int PLATFORM_kbd_joy_0_enabled = TRUE;	/* enabled by default, doesn't hurt */
 int PLATFORM_kbd_joy_1_enabled = FALSE;	/* disabled, would steal normal keys */
 extern unsigned char MXjoy[2]; // joy
+extern int mbt[16];
 extern int retro_sound_finalized;
 
 static UWORD *palette = NULL;
@@ -117,18 +118,34 @@ int PLATFORM_Keyboard(void)
 	if (Key_Sate[RETROK_F4])
 		INPUT_key_consol &= (~INPUT_CONSOL_START);
 
+	/* FIXME handle all keys */
 	if (Key_Sate[RETROK_SPACE])
 		return AKEY_SPACE;
-
 	if (Key_Sate[RETROK_F1])
 		return AKEY_UI;
 
-if (Key_Sate[RETROK_LEFT])return AKEY_LEFT;
-if (Key_Sate[RETROK_RIGHT])return AKEY_RIGHT;
-if (Key_Sate[RETROK_UP])return AKEY_UP;
-if (Key_Sate[RETROK_DOWN])return AKEY_DOWN;
-if (Key_Sate[RETROK_RETURN])return AKEY_RETURN;
-if (Key_Sate[RETROK_ESCAPE])return AKEY_ESCAPE;
+	if (Key_Sate[RETROK_LEFT])return AKEY_LEFT;
+	if (Key_Sate[RETROK_RIGHT])return AKEY_RIGHT;
+	if (Key_Sate[RETROK_UP])return AKEY_UP;
+	if (Key_Sate[RETROK_DOWN])return AKEY_DOWN;
+	if (Key_Sate[RETROK_RETURN])return AKEY_RETURN;
+	if (Key_Sate[RETROK_ESCAPE])return AKEY_ESCAPE;
+
+	/* FIXME joy bind */
+	if (mbt[RETRO_DEVICE_ID_JOYPAD_SELECT])
+		INPUT_key_consol &= (~INPUT_CONSOL_SELECT);
+	if (mbt[RETRO_DEVICE_ID_JOYPAD_START])
+		INPUT_key_consol &= (~INPUT_CONSOL_START);
+	if (mbt[RETRO_DEVICE_ID_JOYPAD_L])
+		INPUT_key_consol &= (~INPUT_CONSOL_OPTION);
+	if (mbt[RETRO_DEVICE_ID_JOYPAD_R])
+		return AKEY_UI;
+	if (mbt[RETRO_DEVICE_ID_JOYPAD_L2])
+		return AKEY_SPACE;
+	if (mbt[RETRO_DEVICE_ID_JOYPAD_R2])
+		return AKEY_ESCAPE;
+	if (mbt[RETRO_DEVICE_ID_JOYPAD_B])
+		return AKEY_RETURN;
 
 	if (UI_is_active){
 	// whitout kbd in GUI 

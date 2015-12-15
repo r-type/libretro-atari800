@@ -78,7 +78,7 @@ char Key_Sate[512];
 char Key_Sate2[512];
 static char old_Key_Sate[512];
 
-static int mbt[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int mbt[16]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 //STATS GUI
 int BOXDEC= 32+2;
