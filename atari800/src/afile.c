@@ -210,7 +210,9 @@ int AFILE_OpenFile(const char *filename, int reboot, int diskno, int readonly)
 //LIBRETRO HACK
 //#ifndef ANDROID
 #if !defined(ANDROID) || defined(__LIBRETRO__)
+		UI_is_active = TRUE;
 				CARTRIDGE_SetTypeAutoReboot(&CARTRIDGE_main, UI_SelectCartType(r));
+		UI_is_active = FALSE;
 #else
 				return (r << 8) | AFILE_ROM;
 #endif /* ANDROID */

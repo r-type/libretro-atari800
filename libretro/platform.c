@@ -129,9 +129,9 @@ if (Key_Sate[RETROK_UP])return AKEY_UP;
 if (Key_Sate[RETROK_DOWN])return AKEY_DOWN;
 if (Key_Sate[RETROK_RETURN])return AKEY_RETURN;
 if (Key_Sate[RETROK_ESCAPE])return AKEY_ESCAPE;
-/*
+
 	if (UI_is_active){
-printf("ui....\n");
+	// whitout kbd in GUI 
 		if (MXjoy[0]&0x04)
 			return AKEY_LEFT;
 		if (MXjoy[0]&0x08)
@@ -145,7 +145,6 @@ printf("ui....\n");
 		if (MXjoy[0]&0x40)
 			return AKEY_ESCAPE;
 	}
-*/
 
 	return AKEY_NONE;
 
@@ -221,12 +220,10 @@ static void get_platform_TRIG(unsigned char *t0, unsigned char *t1)
 	trig0 = trig1 = 1;
 
 	if (PLATFORM_kbd_joy_0_enabled) {
-		//trig0 = !MXjoy[0]&0x80;
 		trig0 = MXjoy[0]&0x80?0:1;
 	}
 
 	if (PLATFORM_kbd_joy_1_enabled) {
-		//trig1 = !MXjoy[1]&0x80;
 		trig1 = MXjoy[1]&0x80?0:1;
 	}
 
@@ -245,20 +242,19 @@ int PLATFORM_PORT(int num)
 {
 	if (num == 0) {
 		UBYTE a, b;
-		//update_SDL_joysticks();
-//printf("ffff %d\n",MXjoy[0]) ;
 		get_platform_PORT(&a, &b);
+
 		return (b << 4) | (a & 0x0f);
 	}
 
-	return 0xff;//(Android_PortStatus >> (num << 3)) & 0xFF;
+	return 0xff;
 }
 
 int PLATFORM_TRIG(int num)
 {
 	UBYTE a, b;
 	get_platform_TRIG(&a, &b);
-//printf("ffff 0x%x: %d %d\n",MXjoy[0],a,b) ;
+
 	switch (num) {
 	case 0:
 		return a;
@@ -268,7 +264,7 @@ int PLATFORM_TRIG(int num)
 		break;
 	}
 
-	return 0x01;//(Android_TrigStatus >> num) & 0x1;
+	return 0x01;
 }
 
 
