@@ -1,7 +1,7 @@
 INCFLAGS := -I$(CORE_DIR) \
             -I$(CORE_DIR)/atari800/src \
-            -I$(CORE_DIR)/libretro  
-
+            -I$(CORE_DIR)/libretro  \
+            -I$(CORE_DIR)/libretro/libco 
 SOURCES_C := \
 	$(CORE_DIR)/libretro/libco/libco.c
 

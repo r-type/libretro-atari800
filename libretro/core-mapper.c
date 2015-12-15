@@ -192,14 +192,18 @@ extern unsigned short int bmp[400*300];
 extern unsigned atari_devices[ 2 ];
 
 #include "pokeysnd.h"
+extern int UI_is_active;
 
 void retro_sound_update()
 {	
 	int x,silent=POKEYSND_enable_new_pokey?24449:32768;
+	
+	if (! UI_is_active) {
+		POKEYSND_Process(SNDBUF,snd_sampler_pal*2);
+		for(x=0;x<snd_sampler_pal*2;x+=2)
+			retro_audio_cb(SNDBUF[x]+silent,SNDBUF[x+1]+silent);
+	}
 
-	POKEYSND_Process(SNDBUF,snd_sampler_pal*2);
-	for(x=0;x<snd_sampler_pal*2;x+=2)
-		retro_audio_cb(SNDBUF[x]+silent,SNDBUF[x+1]+silent);
 }
 
 //FIXME in kdbauto.c

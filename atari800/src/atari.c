@@ -424,7 +424,9 @@ int Atari800_Initialise(int *argc, char *argv[])
 		}
 		*argc = j;
 	}
-#ifndef ANDROID
+//LIBRETRO HACK
+//#ifndef ANDROID
+#if !defined(ANDROID) || defined(__LIBRETRO__)
 	got_config = CFG_LoadConfig(rtconfig_filename);
 #else
 	got_config = TRUE; /* pretend we got a config file -- not needed in Android */
@@ -432,7 +434,13 @@ int Atari800_Initialise(int *argc, char *argv[])
 
 	/* try to find ROM images if the configuration file is not found
 	   or it does not specify some ROM paths (blank paths count as specified) */
-#ifndef ANDROID
+//LIBRETRO HACK
+//#ifndef ANDROID
+#if !defined(ANDROID) || defined(__LIBRETRO__)
+#if defined(__LIBRETRO__) && defined(ANDROID) 
+//FIXME USE RETROSYSDIR
+	SYSROM_FindInDir("/mnt/sdcard/atari800", TRUE);
+#endif
 	SYSROM_FindInDir(".", TRUE); /* current directory */
 #if defined(unix) || defined(__unix__) || defined(__linux__)
 	SYSROM_FindInDir("/usr/share/atari800", TRUE);
