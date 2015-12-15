@@ -1039,6 +1039,11 @@ static void autoframeskip(double curtime, double lasttime)
 	}
 }
 
+//LIBRETRO HACK
+#ifdef __LIBRETRO__
+#include "libretro-core.h"
+#endif
+
 void Atari800_Sync(void)
 {
 	static double lasttime = 0;
@@ -1061,6 +1066,12 @@ void Atari800_Sync(void)
 
 	if ((lasttime + deltatime) < curtime)
 		lasttime = curtime;
+
+//LIBRETRO HACK
+#ifdef __LIBRETRO__
+co_switch(mainThread);
+#endif
+
 }
 
 #if defined(BASIC) || defined(VERY_SLOW) || defined(CURSES_BASIC)
