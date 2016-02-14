@@ -196,7 +196,7 @@ extern int UI_is_active;
 
 void retro_sound_update()
 {	
-	int x;//silent=POKEYSND_enable_new_pokey?24449:32768;
+	int x,silent=POKEYSND_enable_new_pokey?24449:32768;
 	
 	if (! UI_is_active) {
 		POKEYSND_Process(SNDBUF,snd_sampler_pal*4);
