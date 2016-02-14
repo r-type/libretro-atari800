@@ -61,7 +61,7 @@ int skel_main(int argc, char **argv)
 		printf("Failed to initialise!\n");
 		return 3;
 	}
-	POKEYSND_Init(POKEYSND_FREQ_17_EXACT, 44100, 2, 0);
+	POKEYSND_Init(POKEYSND_FREQ_17_EXACT, 44100, 1, 1);
 	retro_sound_finalized=1;
 
 	printf("First retrun to main thread!\n");
