@@ -61,7 +61,7 @@ int skel_main(int argc, char **argv)
 		printf("Failed to initialise!\n");
 		return 3;
 	}
-	POKEYSND_Init(POKEYSND_FREQ_17_EXACT, 44100, 1, 1);
+	//POKEYSND_Init(POKEYSND_FREQ_17_EXACT, 44100, 1, 1);
 	retro_sound_finalized=1;
 
 	printf("First retrun to main thread!\n");
@@ -294,9 +294,10 @@ int PLATFORM_SoundSetup(Sound_setup_t *setup)
 {
 	//force 16 bit stereo sound at 44100
 	setup->freq=44100;
-	setup->sample_size=2;
-	setup->channels=2;
-	setup->buffer_ms=20;
+	setup->sample_size=1;
+	setup->channels=1;
+//	setup->buffer_ms=20;
+	setup->buffer_frames = 1024;
 
 	return TRUE;
 }
