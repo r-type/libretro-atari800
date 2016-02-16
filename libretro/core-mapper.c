@@ -202,10 +202,10 @@ void retro_sound_update()
 	
 	if (! UI_is_active) {
 
-		Sound_Callback(SBUF, 1024);
+		Sound_Callback(SNDBUF, 1024*2*2);
 		//POKEYSND_Process(SNDBUF,snd_sampler_pal);
-		for(x=0;x<snd_sampler_pal;x++){
-	
+		for(x=0;x<snd_sampler_pal*2;x+=2){
+/*	
 		int smp  = ((int) (((UBYTE *) SBUF)[x]) - 0x80) * 0x100;
 		//int smp2 = ((int) (((UBYTE *) SBUF)[x+snd_sampler_pal]) - 0x80) * 0x100;
 
@@ -213,14 +213,14 @@ void retro_sound_update()
 			smp = 32767;
 		else if (smp < -32768)
 			smp = -32768;
-
+*/
 /*
 		if (smp2 > 32767)
 			smp2 = 32767;
 		else if (smp2 < -32768)
 			smp2 = -32768;
 */
-		retro_audio_cb(smp,smp);
+		retro_audio_cb(SNDBUF[x],SNDBUF[x+1]);
 
 
 		}

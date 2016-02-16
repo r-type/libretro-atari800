@@ -294,8 +294,8 @@ int PLATFORM_SoundSetup(Sound_setup_t *setup)
 {
 	//force 16 bit stereo sound at 44100
 	setup->freq=44100;
-	setup->sample_size=1;
-	setup->channels=1;
+	setup->sample_size=2;
+	setup->channels=2;
 //	setup->buffer_ms=20;
 	setup->buffer_frames = 1024;
 
