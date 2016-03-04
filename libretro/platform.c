@@ -51,6 +51,9 @@ extern unsigned char MXjoy[2]; // joy
 extern int mbt[16];
 extern int retro_sound_finalized;
 
+int CURRENT_TV=Atari800_TV_PAL;
+int ToggleTV=0;
+
 static UWORD *palette = NULL;
 
 int skel_main(int argc, char **argv)
@@ -75,6 +78,10 @@ int skel_main(int argc, char **argv)
 		if (Atari800_display_screen)
 			PLATFORM_DisplayScreen();
 		
+		if(CURRENT_TV!=Atari800_tv_mode){
+			CURRENT_TV=Atari800_tv_mode;
+			ToggleTV=1;
+		}
 	}
 }
 

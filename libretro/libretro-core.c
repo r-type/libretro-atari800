@@ -22,6 +22,10 @@ int RETROJOY=0,RETROPT0=0,RETROSTATUS=0,RETRODRVTYPE=0;
 int retrojoy_init=0,retro_ui_finalized=0;
 int retro_sound_finalized=0;
 
+float retro_fps=49.8607597;
+extern int ToggleTV;
+extern int CURRENT_TV;
+
 extern int SHIFTON,pauseg,SND ,snd_sampler_pal;
 extern short signed int SNDBUF[1024*2];
 extern char RPATH[512];
@@ -46,6 +50,7 @@ static retro_video_refresh_t video_cb;
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
 static retro_environment_t environ_cb;
+retro_log_printf_t log_cb;
 
 void retro_set_environment(retro_environment_t cb)
 {
@@ -188,8 +193,44 @@ void retro_reset(void){
 
 }
 
+void retro_get_system_av_info(struct retro_system_av_info *info)
+{
+   update_variables();
+
+   info->geometry.base_width  = retrow;
+   info->geometry.base_height = retroh;
+
+   if (log_cb)
+      log_cb(RETRO_LOG_INFO, "AV_INFO: width=%d height=%d\n",info->geometry.base_width,info->geometry.base_height);
+
+   info->geometry.max_width   = 400;
+   info->geometry.max_height  = 300;
+
+   if (log_cb)
+      log_cb(RETRO_LOG_INFO, "AV_INFO: max_width=%d max_height=%d\n",info->geometry.max_width,info->geometry.max_height);
+
+   info->geometry.aspect_ratio = 4.0 / 3.0;
+
+   if (log_cb)
+      log_cb(RETRO_LOG_INFO, "AV_INFO: aspect_ratio = %f\n",info->geometry.aspect_ratio);
+
+   info->timing.fps            = retro_fps;
+   info->timing.sample_rate    = 44100.0;
+
+   if (log_cb)
+      log_cb(RETRO_LOG_INFO, "AV_INFO: fps = %f sample_rate = %f\n",info->timing.fps,info->timing.sample_rate);
+
+}
+
 void retro_init(void)
-{    	
+{
+   struct retro_log_callback log;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
+      log_cb = log.log;
+   else
+      log_cb = NULL;
+	
    const char *system_dir = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_dir) && system_dir)
@@ -312,17 +353,16 @@ void retro_get_system_info(struct retro_system_info *info)
    info->block_extract = false;
 
 }
-
+/*
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
-//FIXME handle vice PAL/NTSC
    struct retro_game_geometry geom = { retrow, retroh, 400, 300,4.0 / 3.0 };
-   struct retro_system_timing timing = { 50.0, 44100.0 };
+   struct retro_system_timing timing = { retro_fps, 44100.0 };
 
    info->geometry = geom;
    info->timing   = timing;
 }
-
+*/
 void retro_set_audio_sample(retro_audio_sample_t cb)
 {
    audio_cb = cb;
@@ -353,6 +393,24 @@ void retro_run(void)
       update_variables();
   
 	if(pauseg==0){
+
+   if (ToggleTV == 1)
+   {
+      struct retro_system_av_info ninfo;
+	
+      retro_fps=CURRENT_TV==312?49.8607597:59.9227434;
+
+      retro_get_system_av_info(&ninfo);
+
+      environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &ninfo);
+
+      if (log_cb)
+         log_cb(RETRO_LOG_INFO, "ChangeAV: w:%d h:%d ra:%f.\n",
+               ninfo.geometry.base_width, ninfo.geometry.base_height, ninfo.geometry.aspect_ratio);
+
+      ToggleTV=0;
+   }
+
 
 		if(retro_sound_finalized)retro_sound_update();
 
