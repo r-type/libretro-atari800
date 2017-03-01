@@ -435,6 +435,9 @@ static int Devices_MakeDirectory(const char *filename)
 
 static int Devices_MakeDirectory(const char *filename)
 {
+#ifdef __WIN32__
+#define MKDIR_TAKES_ONE_ARG 1
+#endif
 	return mkdir(filename
 #ifndef MKDIR_TAKES_ONE_ARG
 		, 0777
