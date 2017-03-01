@@ -115,6 +115,34 @@ int PLATFORM_Exit(int run_monitor)
 
 int PLATFORM_Keyboard(void)
 {	
+	int shiftctrl = 0;
+	if (INPUT_key_shift)
+		shiftctrl ^= AKEY_SHFT;
+
+	if (Atari800_machine_type == Atari800_MACHINE_5200 && !UI_is_active) {
+
+
+		if (Key_Sate[RETROK_F4])
+			return AKEY_5200_START ^ shiftctrl;
+
+		if(Key_Sate[RETROK_p])return AKEY_5200_PAUSE ^ shiftctrl;
+		if(Key_Sate[RETROK_r])return AKEY_5200_RESET ^ shiftctrl;
+		if(Key_Sate[RETROK_0])return AKEY_5200_0 ^ shiftctrl;
+		if(Key_Sate[RETROK_1])return AKEY_5200_1 ^ shiftctrl;
+		if(Key_Sate[RETROK_2])return AKEY_5200_2 ^ shiftctrl;
+		if(Key_Sate[RETROK_3])return AKEY_5200_3 ^ shiftctrl;
+		if(Key_Sate[RETROK_4])return AKEY_5200_4 ^ shiftctrl;
+		if(Key_Sate[RETROK_5])return AKEY_5200_5 ^ shiftctrl;
+		if(Key_Sate[RETROK_6])return AKEY_5200_6 ^ shiftctrl;
+		if(Key_Sate[RETROK_7])return AKEY_5200_7 ^ shiftctrl;
+		if(Key_Sate[RETROK_8])return AKEY_5200_8 ^ shiftctrl;
+		if(Key_Sate[RETROK_9])return AKEY_5200_9 ^ shiftctrl;
+		if(Key_Sate[RETROK_HASH])return AKEY_5200_HASH ^ shiftctrl;
+		if(Key_Sate[RETROK_EQUALS])return AKEY_5200_HASH ^ shiftctrl;
+		if(Key_Sate[RETROK_ASTERISK])return AKEY_5200_ASTERISK ^ shiftctrl;
+
+		return AKEY_NONE;
+	}
 
 	/* OPTION / SELECT / START keys */
 	INPUT_key_consol = INPUT_CONSOL_NONE;
