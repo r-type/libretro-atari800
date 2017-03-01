@@ -242,7 +242,7 @@ else
 	SHARED := -shared -static-libgcc -static-libstdc++ -Wl,-no-undefined -Wl,-version-script=link.T
 	LIBS += -lshlwapi
 	HAVE_WIN32_MSX_MANAGER = 1
-
+	PLATFORM_DEFINES := -D__WIN32__
 endif
 
 CORE_DIR  := .
