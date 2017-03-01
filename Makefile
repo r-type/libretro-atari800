@@ -232,7 +232,15 @@ else ifneq (,$(findstring armv,$(platform)))
 # emscripten
 else ifeq ($(platform), emscripten)
 	TARGET := $(TARGET_NAME)_libretro_emscripten.bc
-
+# cross Windows
+else ifeq ($(platform), wincross64)
+	TARGET := $(TARGET_NAME)_libretro.dll
+	AR = x86_64-w64-mingw32-ar
+	CC = x86_64-w64-mingw32-gcc
+	CXX = x86_64-w64-mingw32-g++ 
+	SHARED := -shared -static-libgcc -static-libstdc++ -Wl,-no-undefined -Wl,-version-script=link.T
+	LIBS += -lshlwapi
+	PLATFORM_DEFINES += -DDIR_SEP_BACKSLASH=1
 # Windows
 else
 	TARGET := $(TARGET_NAME)_libretro.dll
@@ -241,8 +249,7 @@ else
 	CXX = g++
 	SHARED := -shared -static-libgcc -static-libstdc++ -Wl,-no-undefined -Wl,-version-script=link.T
 	LIBS += -lshlwapi
-	HAVE_WIN32_MSX_MANAGER = 1
-	PLATFORM_DEFINES := -D__WIN32__
+	PLATFORM_DEFINES += -D__WIN32__ -DDIR_SEP_BACKSLASH=1
 endif
 
 CORE_DIR  := .
