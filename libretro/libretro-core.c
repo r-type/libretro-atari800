@@ -16,7 +16,7 @@ int retroh=300;
 
 unsigned atari_devices[ 2 ];
 
-int autorun=0;
+int autorun5200=0;
 
 int RETROJOY=0,RETROPT0=0,RETROSTATUS=0,RETRODRVTYPE=0;
 int retrojoy_init=0,retro_ui_finalized=0;
@@ -78,7 +78,7 @@ void retro_set_environment(retro_environment_t cb)
 
 	  { 
 		"atari800_opt1",
-		"Option 1; disabled|enabled" ,
+		"Autodetect A5200 CartType; disabled|enabled" ,
 	  },
       {
          "atari800_resolution",
@@ -102,7 +102,7 @@ static void update_variables(void)
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
    {
      if (strcmp(var.value, "enabled") == 0)
-			 autorun = 1;
+			 autorun5200 = 1;
    }
 
    var.key = "atari800_resolution";
@@ -438,6 +438,21 @@ lastchar=character;
 */
 }
 
+int HandleExtension(char *path,char *ext)
+{
+   int len = strlen(path);
+
+   if (len >= 4 &&
+         path[len-4] == '.' &&
+         path[len-3] == ext[0] &&
+         path[len-2] == ext[1] &&
+         path[len-1] == ext[2])
+   {printf("path (%s)\n",path);
+      return 1;
+   }
+
+   return 0;
+}
 
 bool retro_load_game(const struct retro_game_info *info)
 {
@@ -454,6 +469,9 @@ bool retro_load_game(const struct retro_game_info *info)
    strcpy(RPATH,full_path);
 
    update_variables();
+
+	if( HandleExtension((char*)RPATH,"a52") || HandleExtension((char*)RPATH,"A52"))
+		autorun5200=1;
 
 #ifdef RENDER16B
 	memset(Retro_Screen,0,400*300*2);

@@ -1370,7 +1370,10 @@ void CARTRIDGE_ColdStart(void) {
 	ResetCartState(&CARTRIDGE_piggyback);
 	MapActiveCart();
 }
-
+#ifdef __LIBRETRO__
+#include "atari5200_hash.h"
+extern int autorun5200;
+#endif
 /* Loads a cartridge from FILENAME. Copies FILENAME to CART_FILENAME.
    Allocates a buffer with cartridge image data and puts it in *CART_IMAGE.
    Sets *CART_TYPE to the cartridge type. */
@@ -1380,7 +1383,9 @@ static int InsertCartridge(const char *filename, CARTRIDGE_image_t *cart)
 	int len;
 	int type;
 	UBYTE header[16];
-
+#ifdef __LIBRETRO__
+		ULONG crc;
+#endif
 	/* open file */
 	fp = fopen(filename, "rb");
 	if (fp == NULL)
@@ -1388,7 +1393,12 @@ static int InsertCartridge(const char *filename, CARTRIDGE_image_t *cart)
 	/* check file length */
 	len = Util_flen(fp);
 	Util_rewind(fp);
-
+#ifdef __LIBRETRO__
+		if(autorun5200){
+			CRC32_FromFile(fp, &crc);
+			Util_rewind(fp);
+		}
+#endif
 	/* Guard against providing cart->filename as parameter. */
 	if (cart->filename != filename)
 		/* Save Filename for state save */
@@ -1406,6 +1416,41 @@ static int InsertCartridge(const char *filename, CARTRIDGE_image_t *cart)
 		cart->type = CARTRIDGE_NONE;
 		len >>= 10;	/* number of kilobytes */
 		cart->size = len;
+#ifdef __LIBRETRO__
+		if(autorun5200){
+			int match=0,i=0;
+			printf("Hack Libretro:atari800_opt1 ON\n");
+			while(a5200_game[i].type!=-1){
+				if(crc==a5200_game[i].crc){
+					match=1;
+					if(a5200_game[i].type==0)
+						switch(cart->size){
+							case 4096:
+								cart->type =CARTRIDGE_5200_4;
+								break;
+							case 8192:
+								cart->type =CARTRIDGE_5200_8;
+								break;
+							case 16384:
+								cart->type =CARTRIDGE_5200_NS_16;
+								break;
+							case 32768:
+								cart->type =CARTRIDGE_5200_32;
+								break;
+
+						}
+					else if(a5200_game[i].type==1)cart->type =CARTRIDGE_5200_40;
+					else if(a5200_game[i].type==2)cart->type =CARTRIDGE_5200_EE_16;
+					printf("Hack Libretro:A5200 cart->type:%d %x\n",cart->type,crc);
+					break;
+				}
+					
+				i++;
+			}
+
+			if(match==1)goto label_fin;
+		}		
+#endif
 		for (type = 1; type <= CARTRIDGE_LAST_SUPPORTED; type++)
 			if (CARTRIDGE_kb[type] == len) {
 				if (cart->type == CARTRIDGE_NONE) {
@@ -1416,6 +1461,9 @@ static int InsertCartridge(const char *filename, CARTRIDGE_image_t *cart)
 					return len;
 				}
 			}
+#ifdef __LIBRETRO__
+label_fin:
+#endif
 		if (cart->type != CARTRIDGE_NONE) {
 			InitCartridge(cart);
 			return 0;	/* ok */
