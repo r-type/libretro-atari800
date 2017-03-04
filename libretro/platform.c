@@ -143,7 +143,7 @@ int PLATFORM_Keyboard(void)
 
 		return AKEY_NONE;
 	}
-
+else if (Atari800_machine_type != Atari800_MACHINE_5200 && !UI_is_active){
 	/* OPTION / SELECT / START keys */
 	INPUT_key_consol = INPUT_CONSOL_NONE;
 	if (Key_Sate[RETROK_F2])
@@ -181,7 +181,7 @@ int PLATFORM_Keyboard(void)
 		return AKEY_ESCAPE;
 	if (mbt[RETRO_DEVICE_ID_JOYPAD_B])
 		return AKEY_RETURN;
-
+}
 	if (UI_is_active){
 	// whitout kbd in GUI 
 		if (MXjoy[0]&0x04)

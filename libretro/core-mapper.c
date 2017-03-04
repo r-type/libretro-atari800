@@ -221,13 +221,14 @@ void vkbd_key(int key,int pressed){
 		if(SHIFTON==1)
 			;//keyboard_matrix[0x25 >> 4] &= ~bit_values2[0x25 & 7]; // key needs to be SHIFTed
 
+Key_Sate[key]=1;
 		//keyboard_matrix[(unsigned char)key >> 4] &= ~bit_values2[(unsigned char)key & 7]; // key is being held down
 
 	}
 	else {
 		if(SHIFTON==1)
 			;//keyboard_matrix[0x25 >> 4] |= bit_values2[0x25 & 7]; // make sure key is unSHIFTed
-
+Key_Sate[key]=0;
 		//keyboard_matrix[(unsigned char)key >> 4] |= bit_values2[(unsigned char)key & 7];
 
 	}
@@ -600,7 +601,7 @@ F12 PLAY TAPE
 
 int Retro_PollEvent()
 {
-	//   RETRO        B    Y    SLT  STA  UP   DWN  LEFT RGT  A    X    L    R    L2   R2   L3   R3
+    //   RETRO        B    Y    SLT  STA  UP   DWN  LEFT RGT  A    X    L    R    L2   R2   L3   R3
     //   INDEX        0    1    2    3    4    5    6    7    8    9    10   11   12   13   14   15
 
    int SAVPAS=PAS;	
