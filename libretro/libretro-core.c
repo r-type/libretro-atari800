@@ -447,7 +447,7 @@ int HandleExtension(char *path,char *ext)
          path[len-3] == ext[0] &&
          path[len-2] == ext[1] &&
          path[len-1] == ext[2])
-   {printf("path (%s)\n",path);
+   {
       return 1;
    }
 
