@@ -46,7 +46,7 @@ extern int UI_is_active;
 
 static int swap_joysticks = FALSE;
 int PLATFORM_kbd_joy_0_enabled = TRUE;	/* enabled by default, doesn't hurt */
-int PLATFORM_kbd_joy_1_enabled = FALSE;	/* disabled, would steal normal keys */
+int PLATFORM_kbd_joy_1_enabled = TRUE;//FALSE;	/* disabled, would steal normal keys */
 extern unsigned char MXjoy[2]; // joy
 extern int mbt[16];
 extern int retro_sound_finalized;
@@ -255,6 +255,7 @@ static void get_platform_PORT(unsigned char *s0, unsigned char *s1)
 			stick0 &= INPUT_STICK_BACK;
 	}
 	if (PLATFORM_kbd_joy_1_enabled) {
+
 		if (MXjoy[1]&0x04)
 			stick1 &= INPUT_STICK_LEFT;
 		if (MXjoy[1]&0x08)
@@ -263,6 +264,7 @@ static void get_platform_PORT(unsigned char *s0, unsigned char *s1)
 			stick1 &= INPUT_STICK_FORWARD;
 		if (MXjoy[1]&0x02)
 			stick1 &= INPUT_STICK_BACK;
+
 	}
 
 	if (swap_joysticks) {

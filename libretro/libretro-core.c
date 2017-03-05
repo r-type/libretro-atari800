@@ -17,6 +17,7 @@ int retroh=300;
 unsigned atari_devices[ 2 ];
 
 int autorun5200=0;
+int a5200_joyhack=0;
 
 int RETROJOY=0,RETROPT0=0,RETROSTATUS=0,RETRODRVTYPE=0;
 int retrojoy_init=0,retro_ui_finalized=0;
@@ -80,11 +81,16 @@ void retro_set_environment(retro_environment_t cb)
 		"atari800_opt1",
 		"Autodetect A5200 CartType; disabled|enabled" ,
 	  },
+	  { 
+		"atari800_opt2",
+		"Joy hack A5200 for robotron; disabled|enabled" ,
+	  },
       {
          "atari800_resolution",
          "Internal resolution; 336x240|320x240|384x240|384x272|384x288|400x300",
       },
   
+
       { NULL, NULL },
    };
 
@@ -103,6 +109,15 @@ static void update_variables(void)
    {
      if (strcmp(var.value, "enabled") == 0)
 			 autorun5200 = 1;
+   }
+
+   var.key = "atari800_opt2";
+   var.value = NULL;
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+   {
+     if (strcmp(var.value, "enabled") == 0)
+			 a5200_joyhack = 1;
    }
 
    var.key = "atari800_resolution";
