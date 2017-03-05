@@ -1419,7 +1419,7 @@ static int InsertCartridge(const char *filename, CARTRIDGE_image_t *cart)
 #ifdef __LIBRETRO__
 		if(autorun5200){
 			int match=0,i=0;
-			printf("Hack Libretro:atari800_opt1 ON %d\n",cart->size);
+			printf("Hack Libretro:crc A5200 ON sz:%d crc:%x\n",cart->size,crc);
 			while(a5200_game[i].type!=-1){
 				if(crc==a5200_game[i].crc){
 					match=1;

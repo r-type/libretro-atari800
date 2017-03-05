@@ -129,6 +129,9 @@ int PLATFORM_Keyboard(void)
 			INPUT_key_shift = 0;
 		}
 
+	        if (mbt[RETRO_DEVICE_ID_JOYPAD_START])
+			return AKEY_5200_START ^ shiftctrl;
+
 		if (Key_Sate[RETROK_F4])
 			return AKEY_5200_START ^ shiftctrl;
 

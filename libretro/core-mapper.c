@@ -645,7 +645,7 @@ if(atari_devices[0]==RETRO_DEVICE_ATARI_JOYSTICK){
       SHOWKEY=-SHOWKEY;
    }
 
-   i=3;//type ENTER
+   i=3;// START
    if ( input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, i) && mbt[i]==0 )
       mbt[i]=1;
    else if ( mbt[i]==1 && ! input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, i) )
