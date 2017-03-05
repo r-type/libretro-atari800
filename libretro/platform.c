@@ -116,11 +116,18 @@ int PLATFORM_Exit(int run_monitor)
 int PLATFORM_Keyboard(void)
 {	
 	int shiftctrl = 0;
+
 	if (INPUT_key_shift)
 		shiftctrl ^= AKEY_SHFT;
 
 	if (Atari800_machine_type == Atari800_MACHINE_5200 && !UI_is_active) {
 
+		if (MXjoy[0]&0x40) {	/* 2nd action button */
+			INPUT_key_shift = 1;
+		}
+		else {
+			INPUT_key_shift = 0;
+		}
 
 		if (Key_Sate[RETROK_F4])
 			return AKEY_5200_START ^ shiftctrl;
