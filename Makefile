@@ -56,7 +56,7 @@ else ifneq (,$(findstring android,$(platform)))
    	TARGET := $(TARGET_NAME)_libretro_android.so
    	fpic = -fPIC
    	SHARED := -lstdc++ -llog -lz -shared -Wl,--version-script=link.T -Wl,--no-undefined
-
+	CFLAGS += -DDEFAULT_CFG_NAME="\"/mnt/sdcard/atari800.cfg\""
    	CC = arm-linux-androideabi-gcc
    	CXX = arm-linux-androideabi-g++
 # Raspberry Pi
