@@ -24,6 +24,7 @@
 #include "atari.h"
 #include "input.h"
 #include "log.h"
+#include "binload.h"
 #include "monitor.h"
 #include "platform.h"
 #include "sound.h"
@@ -35,6 +36,7 @@
 #include "sound.h"
 #include "screen.h"
 #include "colours.h"
+#include "ui.h"
 
 extern char Key_Sate[512];
 
@@ -113,9 +115,83 @@ int PLATFORM_Exit(int run_monitor)
 	return FALSE;
 }
 
+static int key_control = 0;
+
 int PLATFORM_Keyboard(void)
 {	
 	int shiftctrl = 0;
+
+	UI_alt_function = -1;
+
+	if (Key_Sate[RETROK_LALT]){
+
+		if (Key_Sate[RETROK_r])
+			UI_alt_function = UI_MENU_RUN;
+		else if (Key_Sate[RETROK_y])
+			UI_alt_function = UI_MENU_SYSTEM;
+		else if (Key_Sate[RETROK_o])
+			UI_alt_function = UI_MENU_SOUND;
+		else if (Key_Sate[RETROK_w])
+			UI_alt_function = UI_MENU_SOUND_RECORDING;
+		else if (Key_Sate[RETROK_a])
+			UI_alt_function = UI_MENU_ABOUT;
+		else if (Key_Sate[RETROK_s])
+			UI_alt_function = UI_MENU_SAVESTATE;
+		else if (Key_Sate[RETROK_d])
+			UI_alt_function = UI_MENU_DISK;
+		else if (Key_Sate[RETROK_l])
+			UI_alt_function = UI_MENU_LOADSTATE;
+		else if (Key_Sate[RETROK_c])
+			UI_alt_function = UI_MENU_CARTRIDGE;
+		else if (Key_Sate[RETROK_t])
+			UI_alt_function = UI_MENU_CASSETTE;
+		else if (Key_Sate[RETROK_BACKSLASH])
+			return AKEY_PBI_BB_MENU;
+
+	}
+
+	/* SHIFT STATE */
+	if ((Key_Sate[RETROK_LSHIFT]) || (Key_Sate[RETROK_RSHIFT]))
+		INPUT_key_shift = 1;
+	else
+		INPUT_key_shift = 0;
+
+	/* CONTROL STATE */
+	if ((Key_Sate[RETROK_LCTRL]) || (Key_Sate[RETROK_RCTRL]))
+		key_control = 1;
+	else
+		key_control = 0;
+
+	BINLOAD_pause_loading = FALSE;
+
+	/* OPTION / SELECT / START keys */
+	INPUT_key_consol = INPUT_CONSOL_NONE;
+	if (Key_Sate[RETROK_F2])
+		INPUT_key_consol &= (~INPUT_CONSOL_OPTION);
+	if (Key_Sate[RETROK_F3])
+		INPUT_key_consol &= (~INPUT_CONSOL_SELECT);
+	if (Key_Sate[RETROK_F4])
+		INPUT_key_consol &= (~INPUT_CONSOL_START);
+
+	/* Handle movement and special keys. */
+	if (Key_Sate[RETROK_F1])return AKEY_UI;
+
+	if (Key_Sate[RETROK_F5])
+		return INPUT_key_shift ? AKEY_COLDSTART : AKEY_WARMSTART;
+
+	if (Key_Sate[RETROK_F8]){
+		UI_alt_function = UI_MENU_MONITOR;
+	}
+
+	if (Key_Sate[RETROK_F9])return AKEY_EXIT;
+
+	if (Key_Sate[RETROK_F10])return INPUT_key_shift ? AKEY_SCREENSHOT_INTERLACE : AKEY_SCREENSHOT;
+
+	if (Key_Sate[RETROK_F12])return AKEY_TURBO;
+
+	if (UI_alt_function != -1) {
+		return AKEY_UI;
+	}
 
 	if (INPUT_key_shift)
 		shiftctrl ^= AKEY_SHFT;
@@ -153,30 +229,266 @@ int PLATFORM_Keyboard(void)
 
 		return AKEY_NONE;
 	}
-else if (Atari800_machine_type != Atari800_MACHINE_5200 && !UI_is_active){
-	/* OPTION / SELECT / START keys */
-	INPUT_key_consol = INPUT_CONSOL_NONE;
-	if (Key_Sate[RETROK_F2])
-		INPUT_key_consol &= (~INPUT_CONSOL_OPTION);
-	if (Key_Sate[RETROK_F3])
-		INPUT_key_consol &= (~INPUT_CONSOL_SELECT);
-	if (Key_Sate[RETROK_F4])
-		INPUT_key_consol &= (~INPUT_CONSOL_START);
+
+//else if (Atari800_machine_type != Atari800_MACHINE_5200 && !UI_is_active)
+{
+
+	if (key_control)
+		shiftctrl ^= AKEY_CTRL;
+
+	if (Key_Sate[RETROK_BACKQUOTE] || Key_Sate[RETROK_LSUPER] )
+		return AKEY_ATARI ^ shiftctrl;
+	if (Key_Sate[RETROK_RSUPER] ){
+		if (INPUT_key_shift)
+			return AKEY_CAPSLOCK;
+		else
+			return AKEY_CAPSTOGGLE;
+	}
+	if (Key_Sate[RETROK_END] || Key_Sate[RETROK_F6] )
+		return AKEY_HELP ^ shiftctrl;
+
+	if (Key_Sate[RETROK_PAGEDOWN])
+		return AKEY_F2 | AKEY_SHFT;
+
+	if (Key_Sate[RETROK_PAGEUP])
+		return AKEY_F1 | AKEY_SHFT;
+
+	if (Key_Sate[RETROK_HOME])
+		return key_control ? AKEY_LESS|shiftctrl : AKEY_CLEAR;
+
+	if (Key_Sate[RETROK_PAUSE] || Key_Sate[RETROK_F7] )
+	{
+		if (BINLOAD_wait_active) {
+			BINLOAD_pause_loading = TRUE;
+			return AKEY_NONE;
+		}
+		else
+			return AKEY_BREAK;
+	}
+	if (Key_Sate[RETROK_CAPSLOCK]){
+		if (INPUT_key_shift)
+			return AKEY_CAPSLOCK|shiftctrl;
+		else
+			return AKEY_CAPSTOGGLE|shiftctrl;
+	}
+
+	if (Key_Sate[RETROK_SPACE])
+		return AKEY_SPACE ^ shiftctrl;
+
+	if (Key_Sate[RETROK_BACKSPACE])
+		return AKEY_BACKSPACE|shiftctrl;
+
+	if (Key_Sate[RETROK_RETURN])
+		return AKEY_RETURN ^ shiftctrl;
+
+	if (Key_Sate[RETROK_LEFT])
+		return (!UI_is_active && Atari800_f_keys ? AKEY_F3 : (INPUT_key_shift ? AKEY_PLUS : AKEY_LEFT)) ^ shiftctrl;
+
+	if (Key_Sate[RETROK_RIGHT])
+		return (!UI_is_active && Atari800_f_keys ? AKEY_F4 : (INPUT_key_shift ? AKEY_ASTERISK : AKEY_RIGHT)) ^ shiftctrl;
+	if (Key_Sate[RETROK_UP])
+		return (!UI_is_active && Atari800_f_keys ? AKEY_F1 : (INPUT_key_shift ? AKEY_MINUS : AKEY_UP)) ^ shiftctrl;
+	if (Key_Sate[RETROK_DOWN])
+		return (!UI_is_active && Atari800_f_keys ? AKEY_F2 : (INPUT_key_shift ? AKEY_EQUAL : AKEY_DOWN)) ^ shiftctrl;
+
+	if (Key_Sate[RETROK_ESCAPE])
+		return AKEY_ESCAPE ^ shiftctrl;
+
+	if (Key_Sate[RETROK_TAB])
+		return AKEY_TAB ^ shiftctrl;
+
+	if (Key_Sate[RETROK_DELETE]){
+		if (INPUT_key_shift)
+			return AKEY_DELETE_LINE|shiftctrl;
+		else
+			return AKEY_DELETE_CHAR;
+	}
+	if (Key_Sate[RETROK_INSERT]){
+		if (INPUT_key_shift)
+			return AKEY_INSERT_LINE|shiftctrl;
+		else
+			return AKEY_INSERT_CHAR;
+	}
+
+	if (INPUT_cx85){
+
+		if (Key_Sate[RETROK_KP1])
+			return AKEY_CX85_1;
+		else if (Key_Sate[RETROK_KP2])
+			return AKEY_CX85_2;
+		else if (Key_Sate[RETROK_KP2])
+			return AKEY_CX85_3;
+		else if (Key_Sate[RETROK_KP3])
+			return AKEY_CX85_4;
+		else if (Key_Sate[RETROK_KP4])
+			return AKEY_CX85_5;
+		else if (Key_Sate[RETROK_KP5])
+			return AKEY_CX85_6;
+		else if (Key_Sate[RETROK_KP6])
+			return AKEY_CX85_7;
+		else if (Key_Sate[RETROK_KP7])
+			return AKEY_CX85_8;
+		else if (Key_Sate[RETROK_KP8])
+			return AKEY_CX85_9;
+		else if (Key_Sate[RETROK_KP9])
+			return AKEY_CX85_0;
+		else if (Key_Sate[RETROK_KP0])
+			return AKEY_CX85_2;
+		else if (Key_Sate[RETROK_KP_PERIOD])
+			return AKEY_CX85_PERIOD;
+		else if (Key_Sate[RETROK_KP_MINUS])
+			return AKEY_CX85_MINUS;
+		else if (Key_Sate[RETROK_KP_ENTER])
+			return AKEY_CX85_PLUS_ENTER;
+		else if (Key_Sate[RETROK_KP_DIVIDE])
+			return (key_control ? AKEY_CX85_ESCAPE : AKEY_CX85_NO);
+		else if (Key_Sate[RETROK_KP_MULTIPLY])
+			return AKEY_CX85_DELETE;
+		else if (Key_Sate[RETROK_KP_PLUS])
+			return AKEY_CX85_YES;
+	}
+
+	/* Handle CTRL-0 to CTRL-9 and other control characters */
+	if (key_control) {
+
+		if (Key_Sate[RETROK_PERIOD])
+			return AKEY_FULLSTOP|shiftctrl;
+		if (Key_Sate[RETROK_COMMA])
+			return AKEY_COMMA|shiftctrl;
+		if (Key_Sate[RETROK_SEMICOLON])
+			return AKEY_SEMICOLON|shiftctrl;
+		if (Key_Sate[RETROK_SLASH])
+			return AKEY_SLASH|shiftctrl;
+		if (Key_Sate[RETROK_BACKSLASH])
+			return AKEY_ESCAPE|shiftctrl;
+		if (Key_Sate[RETROK_0])
+			return AKEY_CTRL_0|shiftctrl;
+		if (Key_Sate[RETROK_1])
+			return AKEY_CTRL_1|shiftctrl;
+		if (Key_Sate[RETROK_2])
+			return AKEY_CTRL_2|shiftctrl;
+		if (Key_Sate[RETROK_3])	
+			return AKEY_CTRL_3|shiftctrl;
+		if (Key_Sate[RETROK_4])
+			return AKEY_CTRL_4|shiftctrl;
+		if (Key_Sate[RETROK_5])
+			return AKEY_CTRL_5|shiftctrl;
+		if (Key_Sate[RETROK_6])	
+			return AKEY_CTRL_6|shiftctrl;
+		if (Key_Sate[RETROK_7])
+			return AKEY_CTRL_7|shiftctrl;
+		if (Key_Sate[RETROK_8])	
+			return AKEY_CTRL_8|shiftctrl;
+		if (Key_Sate[RETROK_9])	
+			return AKEY_CTRL_9|shiftctrl;
+	}
+
 
 	/* FIXME handle all keys */
-	if (Key_Sate[RETROK_SPACE])
-		return AKEY_SPACE;
-	if (Key_Sate[RETROK_F1])
-		return AKEY_UI;
 
-	if (Key_Sate[RETROK_LEFT])return AKEY_LEFT;
-	if (Key_Sate[RETROK_RIGHT])return AKEY_RIGHT;
-	if (Key_Sate[RETROK_UP])return AKEY_UP;
-	if (Key_Sate[RETROK_DOWN])return AKEY_DOWN;
-	if (Key_Sate[RETROK_RETURN])return AKEY_RETURN;
-	if (Key_Sate[RETROK_ESCAPE])return AKEY_ESCAPE;
+	if (Key_Sate[RETROK_a])return AKEY_A;
+	if (Key_Sate[RETROK_b])return AKEY_B;
+	if (Key_Sate[RETROK_c])return AKEY_C;
+	if (Key_Sate[RETROK_d])return AKEY_D;
+	if (Key_Sate[RETROK_e])return AKEY_E;
+	if (Key_Sate[RETROK_f])return AKEY_F;
+	if (Key_Sate[RETROK_g])return AKEY_G;
+	if (Key_Sate[RETROK_h])return AKEY_H;
+	if (Key_Sate[RETROK_i])return AKEY_I;
+	if (Key_Sate[RETROK_j])return AKEY_J;
+	if (Key_Sate[RETROK_k])return AKEY_K;
+	if (Key_Sate[RETROK_l])return AKEY_L;
+	if (Key_Sate[RETROK_m])return AKEY_M;
+	if (Key_Sate[RETROK_n])return AKEY_N;
+	if (Key_Sate[RETROK_o])return AKEY_O;
+	if (Key_Sate[RETROK_p])return AKEY_P;
+	if (Key_Sate[RETROK_q])return AKEY_Q;
+	if (Key_Sate[RETROK_r])return AKEY_R;
+	if (Key_Sate[RETROK_s])return AKEY_S;
+	if (Key_Sate[RETROK_t])return AKEY_T;
+	if (Key_Sate[RETROK_u])return AKEY_U;
+	if (Key_Sate[RETROK_v])return AKEY_V;
+	if (Key_Sate[RETROK_w])return AKEY_W;
+	if (Key_Sate[RETROK_x])return AKEY_X;
+	if (Key_Sate[RETROK_y])return AKEY_Y;
+	if (Key_Sate[RETROK_z])return AKEY_Z;
+
+	if (Key_Sate[RETROK_0])return AKEY_0;
+	if (Key_Sate[RETROK_1])return AKEY_1;
+	if (Key_Sate[RETROK_2])return AKEY_2;
+	if (Key_Sate[RETROK_3])return AKEY_3;
+	if (Key_Sate[RETROK_4])return AKEY_4;
+	if (Key_Sate[RETROK_5])return AKEY_5;
+	if (Key_Sate[RETROK_6])return AKEY_6;
+	if (Key_Sate[RETROK_7])return AKEY_7;
+	if (Key_Sate[RETROK_8])return AKEY_8;
+	if (Key_Sate[RETROK_9])return AKEY_9;
+
+//	if (Key_Sate[RETROK_SPACE])return AKEY_SPACE;
+//	if (Key_Sate[RETROK_BACKQUOTE])return AKEY_NONE; //???
+	if (Key_Sate[RETROK_BACKSLASH])return AKEY_BACKSLASH;
+	if (Key_Sate[RETROK_COMMA])return AKEY_COMMA;
+	if (Key_Sate[RETROK_PERIOD])return AKEY_FULLSTOP;
+	if (Key_Sate[RETROK_MINUS])return AKEY_MINUS;
+	if (Key_Sate[RETROK_EQUALS])return AKEY_EQUAL;
+	if (Key_Sate[RETROK_LEFTBRACKET])return AKEY_BRACKETLEFT;
+	if (Key_Sate[RETROK_RIGHTBRACKET])return AKEY_BRACKETRIGHT;
+	if (Key_Sate[RETROK_SEMICOLON])return AKEY_SEMICOLON;
+	if (Key_Sate[RETROK_QUOTE])return AKEY_QUOTE;
+	if (Key_Sate[RETROK_SLASH])return AKEY_SLASH;
+
+//	if (Key_Sate[RETROK_ESCAPE])return AKEY_ESCAPE;
+//	if (Key_Sate[RETROK_RETURN])return AKEY_RETURN;
+//	if (Key_Sate[RETROK_BACKSPACE])return AKEY_BACKSPACE;
+//	if (Key_Sate[RETROK_DELETE])return AKEY_DELETE_CHAR;
+//	if (Key_Sate[RETROK_INSERT])return AKEY_INSERT_CHAR;
+//	if (Key_Sate[RETROK_HOME])return AKEY_CLEAR;
+//	if (Key_Sate[RETROK_END])return AKEY_HELP;
+//	if (Key_Sate[RETROK_PAGEUP])return AKEY_F1 | AKEY_SHFT;
+//	if (Key_Sate[RETROK_PAGEDOWN])return AKEY_F2 | AKEY_SHFT;
+
+//	if (Key_Sate[RETROK_LCTRL])return AKEY_75;
+//	if (Key_Sate[RETROK_TAB])return AKEY_TAB;
+//	if (Key_Sate[RETROK_RCTRL])return AKEY_75;
+//	if (Key_Sate[RETROK_LSHIFT])return AKEY_17;
+//	if (Key_Sate[RETROK_RSHIFT])return AKEY_64;
+//	if (Key_Sate[RETROK_LALT])return AKEY_64;
+//	if (Key_Sate[RETROK_LMETA])return AKEY_75;
+//	if (Key_Sate[RETROK_RALT])return AKEY_64;
+//	if (Key_Sate[RETROK_RMETA])return AKEY_75;
+
+//	if (Key_Sate[RETROK_UP])return AKEY_07)| 0x80;
+//	if (Key_Sate[RETROK_DOWN])return AKEY_07;
+//	if (Key_Sate[RETROK_LEFT])return AKEY_02) | 0x80;
+//	if (Key_Sate[RETROK_RIGHT])return AKEY_02;
+
+//	if (Key_Sate[RETROK_F1])return AKEY_04;
+//	if (Key_Sate[RETROK_F2])return AKEY_04) | 0x80;
+//	if (Key_Sate[RETROK_F3])return AKEY_05;
+//	if (Key_Sate[RETROK_F4])return AKEY_05) | 0x80;
+//	if (Key_Sate[RETROK_F5])return AKEY_06;
+//	if (Key_Sate[RETROK_F6])return AKEY_06) | 0x80;
+//	if (Key_Sate[RETROK_F7])return AKEY_03;
+//	if (Key_Sate[RETROK_F8])return AKEY_03) | 0x80;
+/*
+	if (Key_Sate[RETROK_KP0]
+	if (Key_Sate[RETROK_KP5])return AKEY_03);
+	if (Key_Sate[RETROK_KP1])return AKEY_03);
+	if (Key_Sate[RETROK_KP2])return AKEY_03);
+	if (Key_Sate[RETROK_KP3])return AKEY_03);
+	if (Key_Sate[RETROK_KP4])return AKEY_03);
+	if (Key_Sate[RETROK_KP6])return AKEY_03);
+	if (Key_Sate[RETROK_KP7])return AKEY_03);
+	if (Key_Sate[RETROK_KP8])return AKEY_03);
+	if (Key_Sate[RETROK_KP9])return AKEY_03);
+*/
+/*
+	if (Key_Sate[RETROK_KP_DIVIDE])return AKEY_67;
+	if (Key_Sate[RETROK_KP_ENTER])return AKEY_01;
+*/
 
 	/* FIXME joy bind */
+
 	if (mbt[RETRO_DEVICE_ID_JOYPAD_SELECT])
 		INPUT_key_consol &= (~INPUT_CONSOL_SELECT);
 	if (mbt[RETRO_DEVICE_ID_JOYPAD_START])
@@ -192,6 +504,7 @@ else if (Atari800_machine_type != Atari800_MACHINE_5200 && !UI_is_active){
 	if (mbt[RETRO_DEVICE_ID_JOYPAD_B])
 		return AKEY_RETURN;
 }
+
 	if (UI_is_active){
 	// whitout kbd in GUI 
 		if (MXjoy[0]&0x04)
