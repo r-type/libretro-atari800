@@ -53,7 +53,7 @@ else ifneq (,$(findstring linux-portable,$(platform)))
 	SHARED := -shared -Wl,-version-script=link.T
 # android arm
 else ifneq (,$(findstring android,$(platform)))
-   	TARGET := $(TARGET_NAME)_libretro.so
+   	TARGET := $(TARGET_NAME)_libretro_android.so
    	fpic = -fPIC
    	SHARED := -lstdc++ -llog -lz -shared -Wl,--version-script=link.T -Wl,--no-undefined
 
