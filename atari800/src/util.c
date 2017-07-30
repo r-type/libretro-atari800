@@ -477,6 +477,10 @@ double Util_time(void)
 
 void Util_sleep(double s)
 {
+#ifdef WIIU
+/* no need to sleep on retroarch (we are awake) so bypass it for wiiu */ 
+return;
+#endif
 #ifdef SUPPORTS_PLATFORM_SLEEP
 	PLATFORM_Sleep(s);
 #else /* !SUPPORTS_PLATFORM_SLEEP */

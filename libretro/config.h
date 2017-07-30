@@ -374,7 +374,7 @@
 #define NTSC_FILTER 1
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "pstehlik@sophics.cz"
+#define PACKAGE_BUGREPORT "none@snowhere.org"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "Atari800"
@@ -534,6 +534,10 @@
 # endif
 #endif
 
+
+#ifdef WIIU
+  #define WORDS_BIGENDIAN 1
+#endif
 /* Define if unaligned word access is ok. */
 #define WORDS_UNALIGNED_OK 1
 

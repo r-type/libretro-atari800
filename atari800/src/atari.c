@@ -445,6 +445,11 @@ int Atari800_Initialise(int *argc, char *argv[])
 #if defined(unix) || defined(__unix__) || defined(__linux__)
 	SYSROM_FindInDir("/usr/share/atari800", TRUE);
 #endif
+
+#if defined(WIIU) && defined(__LIBRETRO__)
+SYSROM_FindInDir("sd:/retroarch/cores/system/atari800", TRUE);
+#endif
+
 	if (*argc > 0 && argv[0] != NULL) {
 		char atari800_exe_dir[FILENAME_MAX];
 		char atari800_exe_rom_dir[FILENAME_MAX];

@@ -75,6 +75,11 @@ int CFG_save_on_exit = FALSE;
 #define SYSTEM_WIDE_CFG_FILE "/etc/atari800.cfg"
 #endif
 
+#ifdef WIIU
+#define DEFAULT_CFG_NAME "sd:/retroarch/cores/system/atari800.cfg"
+#define SYSTEM_WIDE_CFG_FILE "sd:/retroarch/cores/system/atari800.cfg"
+#endif
+
 static char rtconfig_filename[FILENAME_MAX];
 
 int CFG_LoadConfig(const char *alternate_config_filename)

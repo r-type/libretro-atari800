@@ -935,6 +935,11 @@ static void GetDirectory(const char *directory)
 #ifdef PS2
 	FilenamesAdd(Util_strdup("[mc0:]"));
 #endif
+#ifdef WIIU
+// FIXME: limited to sd: add usb:
+	FilenamesAdd(Util_strdup("[sd:]"));
+#endif
+
 #ifdef DOS_DRIVES
 	/* in DOS/Windows, add all existing disk letters */
 	{
@@ -1148,6 +1153,12 @@ static int FileSelector(char *path, int select_dir, char pDirectories[][FILENAME
 #ifdef PS2
 				else if (strcmp(selected_filename, "[mc0:]") == 0) {
 					strcpy(new_dir, "mc0:/");
+				}
+#endif
+#ifdef WIIU
+// FIXME for now only sd: ,please add usb:
+				else if (strcmp(selected_filename, "[sd:]") == 0) {
+					strcpy(new_dir, "sd:/");
 				}
 #endif
 #ifdef DOS_DRIVES
