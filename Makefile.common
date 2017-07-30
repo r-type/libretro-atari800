@@ -2,6 +2,11 @@ INCFLAGS := -I$(CORE_DIR) \
             -I$(CORE_DIR)/atari800/src \
             -I$(CORE_DIR)/libretro  \
             -I$(CORE_DIR)/libretro/libco 
+
+ifeq ($(platform), wiiu)
+INCFLAGS += -I$(CORE_DIR)/libretro/include
+endif
+
 SOURCES_C := \
 	$(CORE_DIR)/libretro/libco/libco.c
 
